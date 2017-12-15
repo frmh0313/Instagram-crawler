@@ -2,6 +2,7 @@ from __future__ import division
 
 import argparse
 
+import requests
 from bs4 import BeautifulSoup
 import codecs
 import os
@@ -23,6 +24,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+
+import urllib.request
 
 import json
 
@@ -103,13 +106,42 @@ class InstagramCrawler:
             urls.append(a_tag.get_attribute('href'))
         return urls
 
+    def scrape_time_and_captions(self, urls):
+        doc = requests.get(urls[0])
+        soup = BeautifulSoup(doc.text, 'html.parser')
+        span = soup.find('span', id='react-root')
+        # print(soup.prettify())
+        print(span.text)
+
+        '''
+        for url in urls:
+            with urllib.request.urlopen(url) as url_open:
+                print(url)
+                doc = url_open.read()
+                print("============================")
+                print(doc)
+                print("============================")
+                soup = BeautifulSoup(doc, 'html.parser')
+                print(soup.prettify())
+                # time = soup.find('time', class_="_p29ma _6g6t5")
+                # datetime = time['datetime']
+                # date_title = time['title']
+                # caption = soup.find_all('ul', class_='_b0tqa').text
+                # print("\t{")
+                # print("\t\t'datetime':"+str(datetime))
+                # print("\t\t'datetime_title':"+str(date_title))
+                # print("\t\t'caption:'"+caption)
+                # print("\t},")
+        '''
+
     def crawl(self, query, number):
         self.browse_target_page(query)
         num_of_posts = self.scroll_to_num_of_posts(number)
         urls = self.crawl_post_urls()
+        self.scrape_time_and_captions(urls)
 
-    def scrape_time_and_captions(self, urls):
-        for url in urls:
+
+
 
 
 
