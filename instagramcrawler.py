@@ -119,6 +119,8 @@ class InstagramCrawler:
 
         # scroll page until reached
         load_more_exists = self._driver.find_element_by_css_selector(CSS_LOAD_MORE)
+        REST_AFTER_SCROLL_DOWN = 0.3
+        REST_AFTER_SCROLL_UP = 0.1
         print("load_more_exists:", load_more_exists)
         while load_more_exists is not None:
             try:
@@ -128,11 +130,12 @@ class InstagramCrawler:
                     # EC.presence_of_element_located(
                     #         (By.CSS_SELECTOR, CSS_LOAD_MORE))
                     #     )
+                    time.sleep(1)
                     loadmore.click()
                     self._driver.execute_script(SCROLL_DOWN)
-                    time.sleep(0.2)
+                    time.sleep(REST_AFTER_SCROLL_DOWN)
                     self._driver.execute_script(SCROLL_UP)
-                    time.sleep(0.2)
+                    time.sleep(REST_AFTER_SCROLL_UP)
             except TimeoutException:
                 print("TimeoutException")
                 continue
@@ -143,33 +146,33 @@ class InstagramCrawler:
             except StaleElementReferenceException:
                 print("StaleElementReferenceException")
                 self._driver.execute_script(SCROLL_DOWN)
-                time.sleep(0.2)
+                time.sleep(REST_AFTER_SCROLL_DOWN)
                 self._driver.execute_script(SCROLL_UP)
-                time.sleep(0.2)
+                time.sleep(REST_AFTER_SCROLL_UP)
                 break
 
-        num_to_scroll = int((number-12)/12) + 1
+        num_to_scroll = int((number-12)/120) + 1
 
         for i in range(num_to_scroll):
             print("Scrolls: {}/{}".format(i, num_to_scroll))
             self._driver.execute_script(SCROLL_DOWN)
-            time.sleep(0.2)
+            time.sleep(REST_AFTER_SCROLL_DOWN)
             self._driver.execute_script(SCROLL_UP)
-            time.sleep(0.2)
+            time.sleep(REST_AFTER_SCROLL_UP)
 
         num_loaded_posts = len(self._driver.find_elements_by_xpath("//div[@class='_mck9w _gvoze _f2mse']"))
         print("loaded posts: ", num_loaded_posts)
         if num_loaded_posts < number:
             load_not_finished = True
             while load_not_finished:
-                num_to_scroll_more = int((number - num_loaded_posts - 12)/12) + 1
+                num_to_scroll_more = int((number - num_loaded_posts - 12)/120) + 1
                 print('num_to_scroll_more: ', num_to_scroll_more)
                 for i in range(num_to_scroll_more):
                     print("Scroll more: {}/{}".format(i, num_to_scroll_more))
                     self._driver.execute_script(SCROLL_DOWN)
-                    time.sleep(0.2)
+                    time.sleep(REST_AFTER_SCROLL_DOWN)
                     self._driver.execute_script(SCROLL_UP)
-                    time.sleep(0.2)
+                    time.sleep(REST_AFTER_SCROLL_UP)
                 num_loaded_posts = len(self._driver.find_elements_by_xpath("//div[@class='_mck9w _gvoze _f2mse']"))
                 print('num_loaded_posts_after_loadmore: ', num_loaded_posts)
                 if num_loaded_posts >= number:
